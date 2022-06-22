@@ -4,7 +4,7 @@ const path = require('path');
 let subscribers = {};
 
 const subscribe = (req, res) => {
-  const id = Date.now();
+  const id = Math.random();
 
   res.header({
     'Content-Type': 'text/event-stream',
