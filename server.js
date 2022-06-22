@@ -1,11 +1,9 @@
 const express = require('express');
 const path = require('path');
 
-let subscribers = {};
+const subscribers = new Map();
 
 const subscribe = (req, res) => {
-  const id = Math.random();
-
   res.header({
     'Content-Type': 'text/event-stream',
     Connection: 'keep-alive',
@@ -14,18 +12,17 @@ const subscribe = (req, res) => {
 
   res.write('data: \n\n');
 
-  subscribers[id] = res;
+  subscribers.set(req, res);
 
   req.on('close', () => {
-    delete subscribers[id];
+    subscribers.delete(req);
   });
 };
 
 const publish = message => {
-  for (let id in subscribers) {
-    const res = subscribers[id];
+  subscribers.forEach(res => {
     res.write(`data: ${message}\n\n`);
-  }
+  });
 };
 
 const app = express();
